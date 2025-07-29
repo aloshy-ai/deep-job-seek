@@ -1,0 +1,22 @@
+[run]
+branch = True
+source = src/resume_generator
+
+[paths]
+source =
+    src/resume_generator
+    */site-packages/resume_generator
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    raise NotImplementedError
+    if __name__ == .__main__.:
+    pass
+    raise ImportError
+    except ImportError:
+
+[html]
+directory = coverage/html
