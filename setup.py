@@ -27,7 +27,7 @@ def predownload_model():
 
 def main():
     """Main setup function"""
-    print("🚀 Setting up Resume Generator API...")
+    print("🚀 Setting up Deep Job Seek...")
     
     try:
         install_requirements()

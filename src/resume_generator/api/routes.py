@@ -3,6 +3,7 @@ from flask import request, jsonify, Response, stream_with_context
 from ..core import create_tailored_resume
 from ..services.resume_service import ResumeService
 from ..services.resume_update_service import ResumeUpdateService
+from ..services.resume_replace_service import ResumeReplaceService
 from ..services.resume_retrieval_service import ResumeRetrievalService
 from ..constants import STREAMING_EVENTS
 import json
@@ -71,7 +72,7 @@ def setup_routes(app):
 
     @app.route('/resume/update', methods=['POST'])
     def update_resume():
-        """Update resume data in Qdrant collection"""
+        """Legacy update endpoint - kept for backward compatibility"""
         data = request.get_json()
         
         if not data or 'content' not in data:
@@ -109,6 +110,46 @@ def setup_routes(app):
                 "success": False,
                 "error": str(e),
                 "message": "Internal server error during resume update"
+            }), 500
+
+    @app.route('/resume/replace', methods=['POST'])
+    def replace_resume():
+        """Replace entire resume with new content parsed by AI"""
+        data = request.get_json()
+        
+        if not data or 'content' not in data:
+            return jsonify({
+                "error": "Content is required",
+                "message": "Request body must contain 'content' field with resume data"
+            }), 400
+        
+        content = data['content']
+        
+        if not content or not content.strip():
+            return jsonify({
+                "error": "Content cannot be empty",
+                "message": "Please provide resume content to parse"
+            }), 400
+        
+        try:
+            replace_service = ResumeReplaceService()
+            result = replace_service.replace_resume(content)
+            
+            if result["success"]:
+                return jsonify(result), 200
+            else:
+                # Determine appropriate HTTP status code
+                if result.get("error_type") == "validation_error":
+                    return jsonify(result), 422  # Unprocessable Entity
+                else:
+                    return jsonify(result), 400  # Bad Request
+                
+        except Exception as e:
+            return jsonify({
+                "success": False,
+                "error": str(e),
+                "error_type": "internal_error",
+                "message": "Internal server error during resume replacement"
             }), 500
 
     @app.route('/resume', methods=['GET'])
@@ -158,4 +199,4 @@ def setup_routes(app):
     @app.route('/health', methods=['GET'])
     def health():
         """Health check endpoint"""
-        return jsonify({"status": "healthy", "message": "Resume Generator API is running"})
+        return jsonify({"status": "healthy", "message": "Deep Job Seek API is running"})

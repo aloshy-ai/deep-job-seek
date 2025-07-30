@@ -1,4 +1,4 @@
-# Resume Generator API
+# Deep Job Seek
 
 Generate tailored resumes automatically using AI analysis and vector search.
 
@@ -14,61 +14,194 @@ A REST API that analyzes job descriptions and generates tailored resumes by:
 ## Prerequisites
 
 - Python 3.8+
+- [Docker](https://www.docker.com/get-started) and [Docker Compose](https://docs.docker.com/compose/install/) (for running the Qdrant database and optional containerized deployment)
 - OpenAI-compatible API (e.g., [LM Studio](https://lmstudio.ai/))
-- [Qdrant](https://qdrant.tech/) vector database
-- Resume data in Qdrant collection
 
-## Installation
+## Installation & Setup (Local Development)
 
-```bash
-# Install package and dependencies
-python setup.py
+1.  **Clone the repository:**
 
-# Verify setup
-make health
-```
+    ```bash
+    git clone https://github.com/aloshy-ai/deep-job-seek.git
+    cd deep-job-seek
+    ```
 
-For manual installation:
+2.  **Create and activate a virtual environment:**
 
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3.  **Install Python dependencies:**
+
+    ```bash
+    pip install -r requirements.txt
+    pip install -r requirements-test.txt
+    ```
+
+4.  **Start Qdrant (using Docker Compose):**
+
+    ```bash
+    docker-compose up -d qdrant
+    ```
+
+    This will start the Qdrant database in a Docker container.
+
+5.  **Populate test data:**
+
+    ```bash
+    python scripts/populate_test_data.py
+    ```
+
+## Installation & Setup (Containerized Deployment)
+
+For a fully containerized deployment of both the application and Qdrant:
+
+1.  **Build and Start Services:**
+
+    ```bash
+    docker-compose up --build -d
+    ```
+
+    This command will:
+    - Build the application's Docker image.
+    - Pull the Qdrant Docker image.
+    - Start both the `generator` application and `qdrant` services in detached mode.
+    - Automatically populate the Qdrant database with test data on first run.
+
+2.  **Verify Services:**
+
+    ```bash
+    docker-compose ps
+    ```
+
+    You should see both `generator` and `qdrant` services listed as `Up`.
 
 ## Usage
 
-Start the server:
+### Local Development
+
+Once Qdrant is running and test data is populated:
 
 ```bash
-# Start server
 python main.py
+```
 
-# Server runs on http://localhost:8080
+Your application will be accessible at `http://localhost:8000`.
+
+### Containerized Deployment
+
+Once the Docker Compose services are running:
+
+-   **Application API:** Accessible at `http://localhost:8000`
+-   **Qdrant API:** Accessible at `http://localhost:6333` (HTTP) and `http://localhost:6334` (gRPC)
+
+### Logs
+
+For local development, logs are typically printed to the console or to files in the `logs/` directory.
+
+For containerized deployment, to view logs from all running services:
+
+```bash
+docker-compose logs -f
+```
+
+To view logs from a specific service (e.g., `generator`):
+
+```bash
+docker-compose logs -f generator
+```
+
+### Stopping Services
+
+For local development, you can stop the Python application with `Ctrl+C`.
+
+For containerized deployment, to stop and remove all services, networks, and volumes created by Docker Compose:
+
+```bash
+docker-compose down
 ```
 
 ### API Endpoints
 
-1. **Generate Resume** (POST `/generate`)
+1.  **Generate Resume** (POST `/generate`)
 
-   ```bash
-   curl -X POST http://localhost:8080/generate \
-     -H "Content-Type: application/json" \
-     -d '{"job_description": "Software Engineer position..."}'
-   ```
+    ```bash
+    curl -X POST http://localhost:8000/generate \
+      -H "Content-Type: application/json" \
+      -d '{"job_description": "Software Engineer position..."}'
+    ```
 
-2. **Stream Generation** (POST `/generate/stream`)
+2.  **Stream Generation** (POST `/generate/stream`)
 
-   - Real-time updates via Server-Sent Events (SSE)
-   - Status updates for analysis, search, and completion
+    - Real-time updates via Server-Sent Events (SSE)
+    - Status updates for analysis, search, and completion
 
-3. **Health Check** (GET `/health`)
-   - Verify API and dependencies status
+3.  **Replace Resume** (POST `/resume/replace`) - **Recommended**
+
+    Complete resume replacement with AI parsing - replaces entire resume with new content:
+
+    ```bash
+    # Replace with comprehensive resume data (any format)
+    curl -X POST http://localhost:8000/resume/replace \
+      -H "Content-Type: application/json" \
+      -d '{
+        "content": "# Alice Chen - Senior Full-Stack Developer\n\n## Experience\n\n**TechCorp** (2021-2024)\n- Senior Full-Stack Developer\n- React/Node.js for scalable web apps\n- Team leadership in microservices architecture\n\n## Skills\n- Languages: JavaScript, Python, TypeScript\n- Frontend: React, Vue.js, HTML5, CSS3\n- Backend: Node.js, Flask, FastAPI\n\n## Education\n- Bachelor in Computer Science, NYU (2015-2019)"
+      }'
+    ```
+
+    The AI will intelligently parse any input format (markdown, plaintext, JSON) and structure it according to JSON Resume schema. This approach:
+    - Eliminates edge cases from complex merging logic
+    - Ensures clean, consistent resume structure
+    - Validates against JSON Resume schema
+    - Returns appropriate HTTP status codes (400/422 for validation errors)
+
+4.  **Update Resume** (POST `/resume/update`) - **Legacy**
+
+    ```bash
+    # Add new work experience (JSON format)
+    curl -X POST http://localhost:8000/resume/update \
+      -H "Content-Type: application/json" \
+      -d '{
+        "content": "{\"section\": \"work\", \"company\": \"Tech Corp\", \"position\": \"Engineer\", \"summary\": \"Built APIs\"}",
+        "update_mode": "append",
+        "content_type": "json"
+      }'
+
+    # Add skills from text
+    curl -X POST http://localhost:8000/resume/update \
+      -H "Content-Type: application/json" \
+      -d '{
+        "content": "Python, Flask, Docker, Kubernetes",
+        "update_mode": "append",
+        "content_type": "text",
+        "section_hint": "skills"
+      }'
+    ```
+
+    **Parameters:**
+    - `content`: Resume data (JSON, markdown, or text)
+    - `update_mode`: `merge`, `replace`, or `append` (default: merge)
+    - `content_type`: `auto`, `json`, `markdown`, or `text` (default: auto)
+    - `section_hint`: Target section (basics, work, skills, projects, education)
+
+5.  **Get Resume** (GET `/resume`)
+    - Retrieve complete resume data
+    - Optional `?format=pretty` for human-readable output
+
+6.  **Get Resume Summary** (GET `/resume/summary`)
+    - Get overview without full content
+
+7.  **Health Check** (GET `/health`)
+    - Verify API and dependencies status
 
 ### Output
 
 The API generates two files per request:
 
-1. JSON Resume data (`output/*.json`)
-2. Fitness assessment for cover letters (`output/*.md`)
+1.  JSON Resume data (`output/*.json`)
+2.  Fitness assessment for cover letters (`output/*.md`)
 
 Example fitness assessment:
 
@@ -88,13 +221,15 @@ Ready-to-use statements for your application...
 
 ## Configuration
 
-Main environment variables:
+Main environment variables (can be set in `.env` file or directly in `docker-compose.yml`):
 
 ```bash
 # API Settings (defaults shown)
 OPENAI_API_BASE_URL=http://localhost:1234/v1
-QDRANT_URL=http://localhost:6333
-API_PORT=8080
+QDRANT_HOST=qdrant
+QDRANT_PORT=6333
+EMBEDDING_MODEL=BAAI/bge-small-en-v1.5
+API_PORT=8000
 
 # Output Settings
 SAVE_OUTPUT_FILES=true
@@ -104,77 +239,95 @@ OUTPUT_DIR=output
 
 ## Development
 
-### Setup Development Environment
+### Setup Development Environment (Local)
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/aloshy-ai/deep-job-seek.git
+    cd deep-job-seek
+    ```
+
+2.  **Create and activate a virtual environment:**
+
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    ```
+
+3.  **Install Python dependencies:**
+
+    ```bash
+    pip install -r requirements.txt
+    pip install -r requirements-test.txt
+    ```
+
+4.  **Start Qdrant (using Docker Compose):**
+
+    ```bash
+    docker-compose up -d qdrant
+    ```
+
+    This will start the Qdrant database in a Docker container.
+
+5.  **Populate test data:**
+
+    ```bash
+    python scripts/populate_test_data.py
+    ```
+
+### Running Tests (Local)
+
+Ensure your virtual environment is activated and Qdrant is running (as per setup instructions).
 
 ```bash
-# Install development dependencies
-pip install -r requirements-test.txt
-
-# Set up test data
-python scripts/populate_test_data.py
+pytest
 ```
 
-### Running Tests
+To run specific test files or directories:
 
 ```bash
-# Unit tests only (fast, no external dependencies)
-make test-unit
-
-# All tests (requires running services)
-make test
-
-# Individual test categories
-pytest tests/unit/          # Unit tests
-pytest tests/test_health.py # Health checks
+pytest tests/unit/
+pytest tests/test_health.py
 ```
+
+### Running Tests (Containerized)
+
+If you have the full Docker Compose stack running:
+
+```bash
+docker-compose exec generator pytest
+```
+
+### Test Structure
+
+The test suite focuses on core functionality with essential tests:
+
+-   **Unit Tests** (`tests/unit/`): Fast, isolated tests for utilities
+-   **Health Tests** (`test_health.py`): API health check validation
+-   **Generate Tests** (`test_generate.py`): Resume generation functionality
+-   **Replace Tests** (`test_resume_replace.py`): Resume replacement (recommended approach)
+-   **Retrieval Tests** (`test_resume_retrieval.py`): Resume data fetching
 
 ### Test Prerequisites
 
-Before running integration tests, ensure:
-
-1. LM Studio is running on port 1234
-2. Qdrant is running on port 6333
-3. Test data is populated in Qdrant
+When running tests locally, ensure your OpenAI-compatible API (e.g., LM Studio) is running and accessible. When running tests via `docker-compose exec`, the Qdrant service will be automatically available. Ensure your OpenAI-compatible API is accessible from the `generator` container (if it's not also containerized).
 
 ### Coverage Reports
 
 Test coverage reports are generated in the `coverage` directory:
 
-- HTML report: `coverage/html/index.html`
-- XML report: `coverage/coverage.xml`
-
-## License
-
-MIT
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch
-3. Submit a pull request
-   | ------------------------ | -------------------------- | ------------------------------------------------------ |
-   | `OPENAI_API_BASE_URL` | `http://localhost:1234/v1` | OpenAI-compatible API endpoint |
-   | `OPENAI_API_KEY` | `None` | API key (optional for local APIs, required for remote) |
-   | `QDRANT_URL` | `http://localhost:6333` | Qdrant server URL |
-   | `QDRANT_COLLECTION_NAME` | `resume` | Qdrant collection name |
-   | `API_HOST` | `127.0.0.1` | API server host |
-   | `API_PORT` | `8080` | API server port |
-   | `DEBUG` | `True` | Enable debug mode |
-   | `MAX_TOKENS` | `500` | Maximum tokens for LLM response |
-   | `TEMPERATURE` | `0.7` | LLM temperature setting |
-   | `SEARCH_LIMIT` | `15` | Number of search results to retrieve |
-   | `OUTPUT_DIR` | `output` | Directory to save generated resume files |
-   | `SAVE_OUTPUT_FILES` | `true` | Whether to save resume files to disk |
-   | `SAVE_REASONING_FILES` | `true` | Whether to save reasoning markdown files |
+-   HTML report: `coverage/html/index.html`
+-   XML report: `coverage/coverage.xml`
 
 ## Architecture
 
 ### Component Overview
 
-1. **Job Analysis**: OpenAI-compatible API analyzes job description and extracts keywords
-2. **Vector Search**: Keywords are used to search resume content in Qdrant
-3. **Resume Assembly**: Relevant resume sections are assembled into JSON format
-4. **Response**: Tailored resume is returned following JSON Resume schema
+1.  **Job Analysis**: OpenAI-compatible API analyzes job description and extracts keywords
+2.  **Vector Search**: Keywords are used to search resume content in Qdrant
+3.  **Resume Assembly**: Relevant resume sections are assembled into JSON format
+4.  **Response**: Tailored resume is returned following JSON Resume schema
 
 ### Detailed Structure
 
@@ -193,47 +346,35 @@ src/resume_generator/
 
 ### Architecture Layers
 
-1. **API Layer** (`api/`): Handles HTTP requests/responses, input validation, and response formatting
-2. **Service Layer** (`services/`): Contains core business logic and orchestration
-3. **Utility Layer** (`utils/`): Provides reusable helpers and external service clients
-4. **Configuration Layer**: Manages environment variables and constants
-5. **Health Check Layer**: Verifies dependencies and system health
+1.  **API Layer** (`api/`): Handles HTTP requests/responses, input validation, and response formatting
+2.  **Service Layer** (`services/`): Contains core business logic and orchestration
+3.  **Utility Layer** (`utils/`) : Provides reusable helpers and external service clients
+4.  **Configuration Layer**: Manages environment variables and constants
+5.  **Health Check Layer**: Verifies dependencies and system health
 
 ### Design Patterns
 
-- **Service Layer Pattern**: Encapsulates business logic in service classes
-- **Client Pattern**: Dedicated classes for external services
-- **Builder Pattern**: Step-by-step resume assembly
-- **Application Factory Pattern**: Clean Flask app creation and configuration
-
-## Development
-
-The project follows a standard Python package structure with:
-
-- Configuration management through `config.py`
-- Core logic separated in `core.py`
-- Flask server in `server.py`
-- Comprehensive testing in `tests/`
-- Automated setup with model predownloading
+-   **Service Layer Pattern**: Encapsulates business logic in service classes
+-   **Client Pattern**: Dedicated classes for external services
+-   **Builder Pattern**: Step-by-step resume assembly
+-   **Application Factory Pattern**: Clean Flask app creation and configuration
 
 ## Troubleshooting
 
 ### Common Issues
 
-- **Health check failures**: Run `make health` to diagnose issues before starting
-- **Slow first request**: Models are cached after first download via `setup.py`
-- **Connection errors**: Ensure OpenAI-compatible API and Qdrant are running
-- **API authentication failed**: Check your `OPENAI_API_KEY` is correctly set for remote APIs
-- **API access forbidden**: Verify your API key has the necessary permissions
-- **Empty collection**: The Qdrant 'resume' collection must be populated with resume data
-- **Missing collection**: Create the 'resume' collection in Qdrant and index your resume content
+-   **`port is already allocated` error when running `docker-compose up`**: Another process on your host machine is using one of the ports (e.g., 8000, 6333, 6334) that Docker Compose is trying to map. Identify and stop the conflicting process, or change the port mapping in `docker-compose.yml`.
+-   **Container fails to start**: Check `docker-compose logs <service_name>` for error messages.
+-   **`Qdrant is not ready` (from `docker-entrypoint.sh`)**: Ensure the Qdrant container is starting correctly. Check `docker-compose logs qdrant`.
+-   **Cannot connect to API / API authentication failed**: Ensure your OpenAI-compatible API (e.g., LM Studio) is running and accessible from within the Docker network (if it's also containerized) or from your host machine if it's running locally.
+-   **Empty collection / Missing collection**: The `docker-entrypoint.sh` script should populate the Qdrant collection automatically. If you've manually cleared Qdrant data, you might need to restart the `generator` service or manually run the population script inside the container.
 
-### Health Check Messages
+## License
 
-| Message                                    | Meaning                              | Solution                                            |
-| ------------------------------------------ | ------------------------------------ | --------------------------------------------------- |
-| ❌ Cannot connect to API                   | OpenAI-compatible server not running | Start LM Studio or your API provider                |
-| ❌ API authentication failed               | Invalid API key                      | Check `OPENAI_API_KEY` environment variable         |
-| ❌ Cannot connect to Qdrant                | Qdrant server not running            | Start Qdrant server                                 |
-| ❌ Collection 'resume' not found           | Missing resume collection            | Create and populate the resume collection in Qdrant |
-| ⚠️ Collection 'resume' exists but is empty | Collection has no data               | Add resume data to the collection                   |
+MIT
+
+## Contributing
+
+1.  Fork the repository
+2.  Create your feature branch
+3.  Submit a pull request

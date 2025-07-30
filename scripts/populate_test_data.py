@@ -65,11 +65,11 @@ def create_test_resume_data():
         {
             "id": 6,
             "section": "projects",
-            "name": "Resume Generator API",
+            "name": "Deep Job Seek",
             "description": "Built an AI-powered resume generation system using Flask, Qdrant, and LM Studio",
             "highlights": ["Flask API", "Vector search", "LM Studio integration"],
-            "url": "https://github.com/example/resume-generator",
-            "text": "Resume Generator API AI-powered Flask Qdrant LM Studio vector search"
+            "url": "https://github.com/aloshy-ai/deep-job-seek",
+            "text": "Deep Job Seek AI-powered Flask Qdrant LM Studio vector search"
         }
     ]
 

@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  generator:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        EMBEDDING_MODEL: ${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5} # Pass as build argument, with default
+    ports:
+      - "8000:8000" # Map host port 8000 to container port 8000
+    environment:
+      # Set Qdrant host to the service name 'qdrant' within the Docker network
+      QDRANT_HOST: qdrant
+      QDRANT_PORT: 6333
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5} # Also set as runtime environment variable
+    volumes:
+      - .:/app # Mount the current directory into the container for live code changes (optional for production)
+    depends_on:
+      - qdrant
+    entrypoint: ["docker-entrypoint.sh"]
+
+  qdrant:
+    image: qdrant/qdrant:latest
+    ports:
+      - "6333:6333" # Qdrant HTTP API
+      - "6334:6334" # Qdrant gRPC API
+    volumes:
+      - qdrant_data:/qdrant/storage # Persist Qdrant data to a named volume
+
+volumes:
+  qdrant_data: # Define the named volume for Qdrant data persistence

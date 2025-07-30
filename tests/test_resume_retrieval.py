@@ -71,7 +71,7 @@ class TestResumeRetrievalService:
             },
             {
                 "section": "projects",
-                "name": "Resume Generator API",
+                "name": "Deep Job Seek",
                 "description": "AI-powered resume generation system",
                 "highlights": ["Flask", "Qdrant", "OpenAI"],
                 "url": "https://github.com/example/resume-api",
@@ -124,7 +124,7 @@ class TestResumeRetrievalService:
         # Check projects section
         assert "projects" in resume
         assert len(resume["projects"]) == 1
-        assert resume["projects"][0]["name"] == "Resume Generator API"
+        assert resume["projects"][0]["name"] == "Deep Job Seek"
     
     def test_get_complete_resume_empty_collection(self, retrieval_service):
         """Test retrieval when collection is empty"""

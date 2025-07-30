@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Main entry point for the Resume Generator API"""
+"""Main entry point for Deep Job Seek"""
 import sys
 import os
 
@@ -14,5 +14,5 @@ from resume_generator.server import app
 if __name__ == '__main__':
     from resume_generator.config import API_HOST, API_PORT, DEBUG
     # Health checks are run when importing the server module
-    print(f"\n🚀 Starting Resume Generator API on http://{API_HOST}:{API_PORT}")
+    print(f"\n🚀 Starting Deep Job Seek API on http://{API_HOST}:{API_PORT}")
     app.run(debug=DEBUG, host=API_HOST, port=API_PORT)

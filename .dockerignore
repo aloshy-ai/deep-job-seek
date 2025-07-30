@@ -1,0 +1,39 @@
+# Ignore Git-related files
+.git
+.gitignore
+
+# Ignore Python cache and environment files
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+.venv/
+env/
+.env
+
+# Ignore IDE and editor files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore build artifacts and distribution files
+dist/
+build/
+*.egg-info/
+
+# Ignore test-related files and coverage reports
+.pytest_cache/
+coverage/
+htmlcov/
+.coveragerc
+requirements-test.txt
+
+# Ignore logs and output directories
+logs/
+output/
+
+# Ignore Qdrant storage (will be mounted as a volume)
+qdrant_storage/

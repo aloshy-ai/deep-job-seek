@@ -1,4 +1,4 @@
-"""Utility modules for the Resume Generator"""
+"""Utility modules for Deep Job Seek"""
 from .api_client import query_model, get_api_client
 from .vector_search import search_resume_content, get_search_client
 from .resume_builder import ResumeBuilder

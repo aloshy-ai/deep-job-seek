@@ -1,4 +1,4 @@
-"""Configuration settings for the Resume Generator API"""
+"""Configuration settings for Deep Job Seek"""
 import os
 
 # --- OpenAI API Configuration ---
@@ -6,7 +6,9 @@ OPENAI_API_BASE_URL = os.getenv("OPENAI_API_BASE_URL", "http://localhost:1234/v1
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Optional for local APIs like LM Studio
 
 # --- Qdrant Configuration ---
-QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
+QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")
+QDRANT_PORT = os.getenv("QDRANT_PORT", "6333")
+QDRANT_URL = f"http://{QDRANT_HOST}:{QDRANT_PORT}"
 QDRANT_COLLECTION_NAME = os.getenv("QDRANT_COLLECTION_NAME", "resume")
 
 # --- API Configuration ---

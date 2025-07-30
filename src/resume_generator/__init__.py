@@ -1,4 +1,4 @@
-"""Resume Generator API Package"""
+"""Deep Job Seek Package"""
 from .core import create_tailored_resume
 
 __version__ = "1.0.0"
