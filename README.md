@@ -182,8 +182,6 @@ All Docker images are available at: `ghcr.io/aloshy-ai/deep-job-seek:latest`
 ## License
 MIT
 
----
-
 ```
 ▄▀█ █░░ █▀█ █▀ █░█ █▄█ ░ ▄▀█ █
 █▀█ █▄▄ █▄█ ▄█ █▀█ ░█░ ▄ █▀█ █
