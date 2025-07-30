@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Show branding
+curl -fsSL https://raw.githubusercontent.com/aloshy-ai/branding/main/ascii.sh | bash 2>/dev/null || true
+
 echo "🚀 Starting Deep Job Seek..."
 
 # Check if Docker is installed

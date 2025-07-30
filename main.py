@@ -13,6 +13,17 @@ from resume_generator.server import app
 
 if __name__ == '__main__':
     from resume_generator.config import API_HOST, API_PORT, DEBUG
+    
+    # Show branding on startup
+    import subprocess
+    try:
+        result = subprocess.run(['bash', '-c', 'curl -fsSL https://raw.githubusercontent.com/aloshy-ai/branding/main/ascii.sh | bash'], 
+                               capture_output=True, text=True, timeout=5)
+        if result.stdout:
+            print(result.stdout)
+    except:
+        pass  # Silently fail if branding unavailable
+    
     # Health checks are run when importing the server module
     print(f"\n🚀 Starting Deep Job Seek API on http://{API_HOST}:{API_PORT}")
     app.run(debug=DEBUG, host=API_HOST, port=API_PORT)
