@@ -23,7 +23,7 @@ fi
 # Download docker-compose.yml if it doesn't exist
 if [ ! -f "docker-compose.yml" ]; then
     echo "📥 Downloading Docker Compose configuration..."
-    curl -sSL -o docker-compose.yml https://raw.githubusercontent.com/aloshy-ai/deep-job-seek/main/docker-compose.yml
+    curl -sSL -o docker-compose.yml https://raw.githubusercontent.com/aloshy-ai/deep-job-seek/main/docker-compose.dist.yml
 fi
 
 # Start services

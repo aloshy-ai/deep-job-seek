@@ -1,0 +1,81 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  update-quick-start:
+    name: Update Quick Start Files
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Get release version
+      id: get_version
+      run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+    - name: Update docker-compose.dist.yml for release
+      run: |
+        # Update the image reference to use the specific release tag
+        sed -i "s|image: ghcr.io/aloshy-ai/deep-job-seek:.*|image: ghcr.io/aloshy-ai/deep-job-seek:${{ steps.get_version.outputs.VERSION }}|g" docker-compose.dist.yml
+        
+    - name: Update README with Quick Start
+      run: |
+        # Enable the Quick Start method in README
+        sed -i 's/### One-Line Run (Coming Soon)/### One-Line Run/g' README.md
+        sed -i '/\*Note: Pre-built Docker images are not yet published\./d' README.md
+        sed -i 's/# This will work once Docker images are published to a registry//g' README.md
+
+    - name: Commit and push changes
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docker-compose.dist.yml README.md
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          git commit -m "Enable Quick Start for release ${{ steps.get_version.outputs.VERSION }} [skip ci]"
+          git push
+        fi
+
+    - name: Create release notes
+      run: |
+        cat > release-notes.md << EOF
+        ## 🚀 Quick Start
+        
+        The one-line installation now works with this release:
+        
+        \`\`\`bash
+        curl -sSL https://raw.githubusercontent.com/aloshy-ai/deep-job-seek/main/run.sh | bash
+        \`\`\`
+        
+        ## 🐳 Docker Images
+        
+        - **Latest**: \`ghcr.io/aloshy-ai/deep-job-seek:latest\`
+        - **This Release**: \`ghcr.io/aloshy-ai/deep-job-seek:${{ steps.get_version.outputs.VERSION }}\`
+        - **Platforms**: linux/amd64, linux/arm64
+        
+        ## 📋 What's New
+        
+        - Docker images are now automatically published
+        - Multi-platform support (AMD64 + ARM64)
+        - Quick Start method works without cloning
+        - Automated CI/CD pipeline with testing
+        EOF
+        
+        # Update the release with these notes
+        gh release edit ${{ steps.get_version.outputs.VERSION }} --notes-file release-notes.md
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

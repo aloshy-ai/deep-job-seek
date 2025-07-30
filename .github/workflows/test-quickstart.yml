@@ -1,0 +1,67 @@
+name: Test Quick Start
+
+on:
+  push:
+    branches: [ main ]
+    paths: [ 'run.sh', 'docker-compose.dist.yml' ]
+  pull_request:
+    branches: [ main ]
+    paths: [ 'run.sh', 'docker-compose.dist.yml' ]
+  workflow_dispatch:
+
+jobs:
+  test-quickstart:
+    name: Test Quick Start Method
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Test run.sh script
+      run: |
+        # Create a temporary directory
+        mkdir -p /tmp/quickstart-test
+        cd /tmp/quickstart-test
+        
+        # Download and test the run.sh script (but don't actually run docker-compose)
+        curl -sSL https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/run.sh > run.sh
+        chmod +x run.sh
+        
+        # Verify script syntax
+        bash -n run.sh
+        echo "✅ run.sh syntax is valid"
+        
+        # Test the docker-compose.yml download
+        curl -sSL https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/docker-compose.dist.yml > docker-compose.yml
+        
+        # Validate docker-compose.yml
+        docker-compose config -q
+        echo "✅ docker-compose.yml is valid"
+        
+        # Check if the image exists (for main branch only)
+        if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+          IMAGE=$(grep "image:" docker-compose.yml | head -1 | awk '{print $2}')
+          echo "Checking if image exists: $IMAGE"
+          if docker manifest inspect "$IMAGE" > /dev/null 2>&1; then
+            echo "✅ Docker image exists and is accessible"
+          else
+            echo "⚠️ Docker image not found (this is expected if CI hasn't built it yet)"
+          fi
+        fi
+
+  test-manual-quickstart:
+    name: Test Manual Quick Start (Development)
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Test development setup
+      run: |
+        # Test that development setup works
+        docker-compose config -q
+        echo "✅ Development docker-compose.yml is valid"
+        
+        # Verify Dockerfile exists and is valid
+        docker build --no-cache --target test . || docker build --no-cache .
+        echo "✅ Dockerfile builds successfully"

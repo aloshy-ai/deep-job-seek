@@ -4,16 +4,19 @@ AI-powered REST API that generates tailored resumes from job descriptions using 
 
 ## Quick Start
 
-### One-Line Run (No Clone Required)
+### Development Setup (Recommended)
 ```bash
-curl -sSL https://raw.githubusercontent.com/aloshy-ai/deep-job-seek/main/run.sh | bash
+git clone https://github.com/aloshy-ai/deep-job-seek.git
+cd deep-job-seek
+docker-compose up --build -d
 ```
 **That's it!** API runs at `http://localhost:8000`
 
-### Manual Docker Compose
+### One-Line Run (Coming Soon)
+*Note: Pre-built Docker images are not yet published. Use the development setup above for now.*
 ```bash
-curl -o docker-compose.yml https://raw.githubusercontent.com/aloshy-ai/deep-job-seek/main/docker-compose.yml
-docker-compose up -d
+# This will work once Docker images are published to a registry
+curl -sSL https://raw.githubusercontent.com/aloshy-ai/deep-job-seek/main/run.sh | bash
 ```
 
 ## Prerequisites
@@ -59,14 +62,16 @@ API_PORT=8000
 2.  **Build and Start Services:**
 
     ```bash
+    make run
+    # or
     docker-compose up --build -d
     ```
 
-    This command will:
-    - Build the application's Docker image.
-    - Pull the Qdrant Docker image.
-    - Start both the `generator` application and `qdrant` services in detached mode.
-    - Automatically populate the Qdrant database with test data on first run.
+    This will:
+    - Build the application's Docker image
+    - Pull the Qdrant Docker image
+    - Start both services in detached mode
+    - Automatically populate the Qdrant database with test data
 
 3.  **Verify Services:**
 
@@ -74,28 +79,46 @@ API_PORT=8000
     docker-compose ps
     ```
 
-    You should see both `generator` and `qdrant` services listed as `Up`.
+    You should see both `generator` and `qdrant` services as `Up`.
+
+### Available Commands
+
+```bash
+make help              # Show all available commands
+make build             # Build Docker images
+make run               # Start all services  
+make stop              # Stop all services
+make test              # Run tests
+make logs              # Follow container logs
+make shell             # Open shell in generator container
+make clean             # Clean up containers and volumes
+make populate-data     # Populate test data
+```
 
 ### Running Tests
 
-Tests should be run inside the `generator` container to ensure a consistent environment.
-
 ```bash
-# Install test dependencies and run all tests
+# Run all tests
+make test
+
+# Or manually
 docker-compose exec generator bash -c "pip install -r requirements-test.txt && pytest"
 
-# Run specific test files or directories
+# Run specific test files
 docker-compose exec generator bash -c "pip install -r requirements-test.txt && pytest tests/unit/"
 ```
 
-### Docker Operations
-```bash
-# View logs
-docker-compose logs -f
+### CI/CD Pipeline
 
-# Stop services
-docker-compose down
-```
+The project uses GitHub Actions for automated testing and Docker image publishing:
+
+- **Tests** run on every push and PR
+- **Docker images** are built and published to `ghcr.io/aloshy-ai/deep-job-seek`
+- **Multi-platform support** (AMD64 + ARM64)
+- **Security scanning** with Trivy
+- **Automated releases** when tags are pushed
+
+See [.github/DEPLOYMENT.md](.github/DEPLOYMENT.md) for detailed CI/CD information.
 
 ## How It Works
 1. **AI Analysis** - Job description analyzed for key requirements
