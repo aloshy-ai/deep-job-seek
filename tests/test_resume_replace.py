@@ -419,7 +419,7 @@ class TestResumeReplaceAPI:
         data = response.get_json()
         assert "Content cannot be empty" in data["error"]
     
-    @patch('src.resume_generator.services.resume_replace_service.ResumeReplaceService')
+    @patch('src.resume_generator.api.routes.ResumeReplaceService')
     def test_replace_resume_success(self, mock_service_class, client):
         """Test successful resume replacement"""
         # Mock service instance and response
@@ -451,7 +451,7 @@ class TestResumeReplaceAPI:
             "Alice Chen - Senior Developer at TechCorp with 5 years experience"
         )
     
-    @patch('src.resume_generator.services.resume_replace_service.ResumeReplaceService')
+    @patch('src.resume_generator.api.routes.ResumeReplaceService')
     def test_replace_resume_validation_error(self, mock_service_class, client):
         """Test API with validation error (422)"""
         # Mock service instance and validation error response
@@ -475,7 +475,7 @@ class TestResumeReplaceAPI:
         assert "Resume must contain a name" in data["error"]
         assert data["error_type"] == "validation_error"
     
-    @patch('src.resume_generator.services.resume_replace_service.ResumeReplaceService')
+    @patch('src.resume_generator.api.routes.ResumeReplaceService')
     def test_replace_resume_internal_error(self, mock_service_class, client):
         """Test API with internal error (400)"""
         # Mock service instance and internal error response
@@ -499,7 +499,7 @@ class TestResumeReplaceAPI:
         assert "AI service unavailable" in data["error"]
         assert data["error_type"] == "internal_error"
     
-    @patch('src.resume_generator.services.resume_replace_service.ResumeReplaceService')
+    @patch('src.resume_generator.api.routes.ResumeReplaceService')
     def test_replace_resume_service_exception(self, mock_service_class, client):
         """Test API when service raises exception"""
         # Mock service to raise exception

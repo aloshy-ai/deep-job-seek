@@ -7,12 +7,6 @@ WORKDIR /app
 # Define a build argument for the embedding model
 ARG EMBEDDING_MODEL="BAAI/bge-small-en-v1.5"
 
-# Install system dependencies required for some Python packages (e.g., psycopg2, if used)
-# RUN apt-get update && apt-get install -y --no-install-recommends \
-#     build-essential \
-#     libpq-dev \
-#     && rm -rf /var/lib/apt/lists/*
-
 # Copy the requirements file into the container
 COPY ./requirements.txt /tmp/
 

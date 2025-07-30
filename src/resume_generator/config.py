@@ -1,8 +1,12 @@
-"""Configuration settings for Deep Job Seek"""
+"""Configuration settings for the Resume Generator API"""
 import os
 
 # --- OpenAI API Configuration ---
-OPENAI_API_BASE_URL = os.getenv("OPENAI_API_BASE_URL", "http://localhost:1234/v1")
+# Use host.docker.internal for Docker Desktop to connect to host's localhost
+if os.getenv("DOCKER_ENV") == "true":
+    OPENAI_API_BASE_URL = os.getenv("OPENAI_API_BASE_URL", "http://host.docker.internal:1234/v1")
+else:
+    OPENAI_API_BASE_URL = os.getenv("OPENAI_API_BASE_URL", "http://localhost:1234/v1")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Optional for local APIs like LM Studio
 
 # --- Qdrant Configuration ---

@@ -52,13 +52,40 @@ API_PORT=8000
 
 ## Development
 
-### Testing
-```bash
-# Local testing
-pytest
+### Getting Started
 
-# Docker testing  
-docker-compose exec generator pytest
+1.  **Clone the repository and navigate to the project root**
+
+2.  **Build and Start Services:**
+
+    ```bash
+    docker-compose up --build -d
+    ```
+
+    This command will:
+    - Build the application's Docker image.
+    - Pull the Qdrant Docker image.
+    - Start both the `generator` application and `qdrant` services in detached mode.
+    - Automatically populate the Qdrant database with test data on first run.
+
+3.  **Verify Services:**
+
+    ```bash
+    docker-compose ps
+    ```
+
+    You should see both `generator` and `qdrant` services listed as `Up`.
+
+### Running Tests
+
+Tests should be run inside the `generator` container to ensure a consistent environment.
+
+```bash
+# Install test dependencies and run all tests
+docker-compose exec generator bash -c "pip install -r requirements-test.txt && pytest"
+
+# Run specific test files or directories
+docker-compose exec generator bash -c "pip install -r requirements-test.txt && pytest tests/unit/"
 ```
 
 ### Docker Operations

@@ -10,7 +10,7 @@ src_dir = os.path.join(project_root, 'src')
 if src_dir not in sys.path:
     sys.path.insert(0, src_dir)
 
-from qdrant_client import QdrantClient
+from qdrant_client import QdrantClient, models
 from fastembed import TextEmbedding
 from resume_generator.config import QDRANT_URL, QDRANT_COLLECTION_NAME
 
@@ -65,11 +65,11 @@ def create_test_resume_data():
         {
             "id": 6,
             "section": "projects",
-            "name": "Deep Job Seek",
+            "name": "Resume Generator API",
             "description": "Built an AI-powered resume generation system using Flask, Qdrant, and LM Studio",
             "highlights": ["Flask API", "Vector search", "LM Studio integration"],
-            "url": "https://github.com/aloshy-ai/deep-job-seek",
-            "text": "Deep Job Seek AI-powered Flask Qdrant LM Studio vector search"
+            "url": "https://github.com/example/resume-generator",
+            "text": "Resume Generator API AI-powered Flask Qdrant LM Studio vector search"
         }
     ]
 
@@ -82,6 +82,18 @@ def populate_qdrant():
         qdrant_client = QdrantClient(url=QDRANT_URL)
         embedding_model = TextEmbedding()
         
+        # Ensure collection exists
+        if not qdrant_client.collection_exists(collection_name=QDRANT_COLLECTION_NAME):
+            print(f"Collection '{QDRANT_COLLECTION_NAME}' not found. Creating...")
+            qdrant_client.create_collection(
+                collection_name=QDRANT_COLLECTION_NAME,
+                vectors_config=models.VectorParams(
+                    size=embedding_model.embedding_size,
+                    distance=models.Distance.COSINE,
+                ),
+            )
+            print(f"Collection '{QDRANT_COLLECTION_NAME}' created.")
+
         # Get test data
         test_data = create_test_resume_data()
         

@@ -288,7 +288,7 @@ class TestResumeRetrievalAPI:
         with app.test_client() as client:
             yield client
     
-    @patch('src.resume_generator.services.resume_retrieval_service.ResumeRetrievalService')
+    @patch('src.resume_generator.api.routes.ResumeRetrievalService')
     def test_get_resume_success(self, mock_service_class, client):
         """Test successful resume retrieval via API"""
         # Mock service response
@@ -315,7 +315,7 @@ class TestResumeRetrievalAPI:
         # Verify service was called with correct format
         mock_service.get_complete_resume.assert_called_once_with(format_type='json')
     
-    @patch('src.resume_generator.services.resume_retrieval_service.ResumeRetrievalService')
+    @patch('src.resume_generator.api.routes.ResumeRetrievalService')
     def test_get_resume_pretty_format(self, mock_service_class, client):
         """Test resume retrieval with pretty format"""
         mock_service = Mock()
@@ -339,7 +339,7 @@ class TestResumeRetrievalAPI:
         data = response.get_json()
         assert "Invalid format" in data["error"]
     
-    @patch('src.resume_generator.services.resume_retrieval_service.ResumeRetrievalService')
+    @patch('src.resume_generator.api.routes.ResumeRetrievalService')
     def test_get_resume_not_found(self, mock_service_class, client):
         """Test resume retrieval when no data exists"""
         mock_service = Mock()
@@ -356,7 +356,7 @@ class TestResumeRetrievalAPI:
         data = response.get_json()
         assert data["success"] is False
     
-    @patch('src.resume_generator.services.resume_retrieval_service.ResumeRetrievalService')
+    @patch('src.resume_generator.api.routes.ResumeRetrievalService')
     def test_get_resume_summary_success(self, mock_service_class, client):
         """Test successful resume summary retrieval"""
         mock_service = Mock()
@@ -381,7 +381,7 @@ class TestResumeRetrievalAPI:
         assert "summary" in data
         assert data["summary"]["total_entries"] == 5
     
-    @patch('src.resume_generator.services.resume_retrieval_service.ResumeRetrievalService')
+    @patch('src.resume_generator.api.routes.ResumeRetrievalService')
     def test_get_resume_internal_error(self, mock_service_class, client):
         """Test API when service raises exception"""
         mock_service_class.side_effect = Exception("Database error")
