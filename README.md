@@ -17,6 +17,11 @@ curl -sSL https://raw.githubusercontent.com/aloshy-ai/deep-job-seek/main/run.sh 
 ```
 **That's it!** API runs at `http://localhost:8000`
 
+### 🎮 Try the Live Demo
+**[▶️ Launch Deep Job Seek Mini on HuggingFace Spaces](https://huggingface.co/spaces/aloshy-ai/deep-job-seek-mini)**
+
+Experience the AI-powered resume generation instantly in your browser - no installation required!
+
 ### 🛠️ Development Setup
 ```bash
 git clone https://github.com/aloshy-ai/deep-job-seek.git
