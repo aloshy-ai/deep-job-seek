@@ -33,7 +33,7 @@ jobs:
         curl -sSL https://raw.githubusercontent.com/${{ github.repository }}/${{ github.head_ref || github.ref_name }}/docker-compose.dist.yml > docker-compose.yml
         
         # Validate docker-compose.yml
-        docker-compose config -q
+        docker compose config -q
         echo "✅ docker-compose.yml is valid"
         
         # Check if the image exists (for main branch only)
@@ -59,7 +59,7 @@ jobs:
     - name: Test development setup
       run: |
         # Test that development setup works
-        docker-compose config -q
+        docker compose config -q
         echo "✅ Development docker-compose.yml is valid"
         
         # Verify Dockerfile exists and is valid
