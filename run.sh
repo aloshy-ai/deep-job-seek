@@ -33,7 +33,7 @@ if [ -z "$OPENAI_API_KEY" ]; then
     echo "Get your API key from: https://platform.openai.com/api-keys"
     echo ""
     echo "💡 Alternatively, use LM Studio for local models:"
-    echo "  export OPENAI_API_BASE_URL=http://localhost:1234/v1"
+    echo "  export OPENAI_API_BASE_URL=http://host.docker.internal:1234/v1"
     echo "  export OPENAI_API_KEY=not-needed"
     echo ""
     exit 1

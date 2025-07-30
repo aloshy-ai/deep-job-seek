@@ -17,7 +17,7 @@ def check_openai_api():
         print("❌ OPENAI_API_KEY is required when using OpenAI API")
         print("   Get your API key from: https://platform.openai.com/api-keys")
         print("   Set it with: export OPENAI_API_KEY=your_api_key_here")
-        print("   Or use a local API like LM Studio with: export OPENAI_API_BASE_URL=http://localhost:1234/v1")
+        print("   Or use a local API like LM Studio with: export OPENAI_API_BASE_URL=http://host.docker.internal:1234/v1")
         return False
     
     headers = {"Content-Type": "application/json"}
