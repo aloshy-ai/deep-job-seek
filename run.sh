@@ -23,19 +23,11 @@ else
     exit 1
 fi
 
-# Check for OpenAI API key
-if [ -z "$OPENAI_API_KEY" ]; then
-    echo "🔑 OpenAI API key required for Deep Job Seek"
-    echo ""
-    echo "Please set your OpenAI API key:"
-    echo "  export OPENAI_API_KEY=your_api_key_here"
-    echo ""
-    echo "Get your API key from: https://platform.openai.com/api-keys"
-    echo ""
-    echo "💡 Alternatively, use LM Studio for local models:"
-    echo "  export OPENAI_API_BASE_URL=http://host.docker.internal:1234/v1"
-    echo "  export OPENAI_API_KEY=not-needed"
-    echo ""
+# Validate OpenAI API credentials using the Python validator
+echo "🔑 Validating OpenAI API credentials..."
+python3 src/resume_generator/utils/openai_validator.py
+if [ $? -ne 0 ]; then
+    echo "❌ OpenAI API validation failed. Please fix the issues above."
     exit 1
 fi
 
