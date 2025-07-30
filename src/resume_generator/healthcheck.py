@@ -103,7 +103,7 @@ def check_fastembed_model():
     
     try:
         from fastembed import TextEmbedding
-        # Try to initialize the model (should be cached from setup.py)
+        # Try to initialize the model (should be cached from Docker build)
         model = TextEmbedding()
         print("✅ FastEmbed model is available and cached")
         return True
