@@ -52,48 +52,52 @@ curl -X POST http://localhost:8000/resume/replace \
   -d '{"content": "# John Doe\nSenior Developer at TechCorp..."}'
 ```
 
-## Configuration
-Key environment variables:
+## Configuration Options
+
+### For OpenAI API (Default)
 ```bash
-OPENAI_API_KEY=your_openai_api_key_here       # Required: Your OpenAI API key
-OPENAI_API_BASE_URL=https://api.openai.com/v1 # Optional: Custom API endpoint
-QDRANT_HOST=qdrant                            # Docker service name
-API_PORT=8000
+export OPENAI_API_KEY=your_api_key_here
+# Uses https://api.openai.com/v1 by default
 ```
 
-For local LM Studio usage:
+### For Local LM Studio
 ```bash
-OPENAI_API_BASE_URL=http://localhost:1234/v1  # LM Studio default
-OPENAI_API_KEY=not-needed                     # LM Studio doesn't require a key
+export OPENAI_API_BASE_URL=http://host.docker.internal:1234/v1
+export OPENAI_API_KEY=not-needed
 ```
+> **Note**: Use `host.docker.internal` instead of `localhost` when running in Docker containers to access services on your host machine.
 
 ## Development
 
 ### Getting Started
 
-1.  **Clone the repository and navigate to the project root**
+1.  **Clone the repository:**
+    ```bash
+    git clone https://github.com/aloshy-ai/deep-job-seek.git
+    cd deep-job-seek
+    ```
 
-2.  **Build and Start Services:**
+2.  **Set your API configuration:**
+    ```bash
+    # For OpenAI API
+    export OPENAI_API_KEY=your_api_key_here
+    
+    # OR for LM Studio  
+    export OPENAI_API_BASE_URL=http://host.docker.internal:1234/v1
+    export OPENAI_API_KEY=not-needed
+    ```
 
+3.  **Start services:**
     ```bash
     make run
     # or
     docker-compose up --build -d
     ```
 
-    This will:
-    - Build the application's Docker image
-    - Pull the Qdrant Docker image
-    - Start both services in detached mode
-    - Automatically populate the Qdrant database with test data
-
-3.  **Verify Services:**
-
+4.  **Verify services:**
     ```bash
-    docker-compose ps
+    curl http://localhost:8000/health
     ```
-
-    You should see both `generator` and `qdrant` services as `Up`.
 
 ### Available Commands
 
@@ -151,10 +155,24 @@ All Docker images are available at: `ghcr.io/aloshy-ai/deep-job-seek:latest`
 ## 🔧 Troubleshooting
 
 ### Common Issues
+
+#### API Connection Issues
+- **OpenAI API errors**: Verify your `OPENAI_API_KEY` is correct and has sufficient credits
+- **LM Studio connection**: 
+  - Ensure LM Studio is running on `localhost:1234`
+  - Use `http://host.docker.internal:1234/v1` as the base URL for Docker
+  - Check that LM Studio is accepting connections from all interfaces
+
+#### Docker Issues  
 - **Port conflicts**: Change ports in `docker-compose.yml` or use `-p` flag
-- **LM Studio connection**: Ensure LM Studio is running on `localhost:1234`
+- **Container startup failures**: Check logs with `docker-compose logs generator`
 - **Empty database**: Restart services to auto-populate test data
-- **Container issues**: Run `docker-compose logs <service>` for debugging
+- **Permission errors**: Ensure Docker daemon is running and accessible
+
+#### Environment Variables
+- **Missing API key**: The application will exit with clear error messages
+- **Wrong base URL**: Use `host.docker.internal` instead of `localhost` for Docker
+- **Configuration not applied**: Restart containers after changing environment variables
 
 ### Getting Help
 - 📋 Check [Issues](https://github.com/aloshy-ai/deep-job-seek/issues) for common problems
