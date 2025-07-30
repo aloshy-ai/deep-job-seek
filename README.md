@@ -1,10 +1,5 @@
 # Deep Job Seek
 
-```
-▄▀█ █░░ █▀█ █▀ █░█ █▄█ ░ ▄▀█ █
-█▀█ █▄▄ █▄█ ▄█ █▀█ ░█░ ▄ █▀█ █
-```
-
 [![CI/CD Pipeline](https://github.com/aloshy-ai/deep-job-seek/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/aloshy-ai/deep-job-seek/actions/workflows/ci-cd.yml)
 [![Docker Image](https://img.shields.io/badge/docker-ghcr.io-blue?logo=docker)](https://github.com/aloshy-ai/deep-job-seek/pkgs/container/deep-job-seek)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -186,3 +181,10 @@ All Docker images are available at: `ghcr.io/aloshy-ai/deep-job-seek:latest`
 
 ## License
 MIT
+
+---
+
+```
+▄▀█ █░░ █▀█ █▀ █░█ █▄█ ░ ▄▀█ █
+█▀█ █▄▄ █▄█ ▄█ █▀█ ░█░ ▄ █▀█ █
+```
