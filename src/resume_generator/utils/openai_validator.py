@@ -20,11 +20,11 @@ def validate_openai_api_key():
         )
         
         # Make a small test request to verify credentials
-        # Using a dict with type ignore to satisfy the type checker
-        client.chat.completions.create(
+        # Suppress type checking for the API call
+        client.chat.completions.create(  # type: ignore
             model="gpt-3.5-turbo", # This model is generally available and cheap for a test
             messages=[
-                {"role": "user", "content": "test"}  # type: ignore
+                {"role": "user", "content": "test"}
             ],
             max_tokens=1,
             temperature=0
