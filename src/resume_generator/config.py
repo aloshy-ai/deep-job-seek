@@ -2,12 +2,9 @@
 import os
 
 # --- OpenAI API Configuration ---
-# Use host.docker.internal for Docker Desktop to connect to host's localhost
-if os.getenv("DOCKER_ENV") == "true":
-    OPENAI_API_BASE_URL = os.getenv("OPENAI_API_BASE_URL", "http://host.docker.internal:1234/v1")
-else:
-    OPENAI_API_BASE_URL = os.getenv("OPENAI_API_BASE_URL", "http://localhost:1234/v1")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Optional for local APIs like LM Studio
+# Standard OpenAI API by default, with fallback for local development
+OPENAI_API_BASE_URL = os.getenv("OPENAI_API_BASE_URL", "https://api.openai.com/v1")
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")  # Required for OpenAI API
 
 # --- Qdrant Configuration ---
 QDRANT_HOST = os.getenv("QDRANT_HOST", "localhost")

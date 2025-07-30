@@ -20,6 +20,22 @@ else
     exit 1
 fi
 
+# Check for OpenAI API key
+if [ -z "$OPENAI_API_KEY" ]; then
+    echo "🔑 OpenAI API key required for Deep Job Seek"
+    echo ""
+    echo "Please set your OpenAI API key:"
+    echo "  export OPENAI_API_KEY=your_api_key_here"
+    echo ""
+    echo "Get your API key from: https://platform.openai.com/api-keys"
+    echo ""
+    echo "💡 Alternatively, use LM Studio for local models:"
+    echo "  export OPENAI_API_BASE_URL=http://localhost:1234/v1"
+    echo "  export OPENAI_API_KEY=not-needed"
+    echo ""
+    exit 1
+fi
+
 # Download docker-compose.yml if it doesn't exist
 if [ ! -f "docker-compose.yml" ]; then
     echo "📥 Downloading Docker Compose configuration..."

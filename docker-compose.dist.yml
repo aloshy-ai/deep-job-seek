@@ -10,6 +10,9 @@ services:
       QDRANT_PORT: 6333
       EMBEDDING_MODEL: ${EMBEDDING_MODEL:-BAAI/bge-small-en-v1.5}
       DOCKER_ENV: "true"
+      # OpenAI API configuration (required)
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_API_BASE_URL: ${OPENAI_API_BASE_URL:-https://api.openai.com/v1}
     depends_on:
       qdrant:
         condition: service_healthy
