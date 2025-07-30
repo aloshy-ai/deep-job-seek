@@ -9,7 +9,7 @@ from .conftest import build_generate_url, TestConfig
 class TestGenerateEndpoint:
     """Test cases for resume generation endpoint"""
     
-    @patch('src.resume_generator.core.create_tailored_resume')
+    @patch('src.resume_generator.api.routes.create_tailored_resume')
     def test_generate_endpoint_success(self, mock_create_resume, client, test_config):
         """Test successful resume generation"""
         # Mock the resume generation to return a valid JSON Resume
@@ -84,7 +84,7 @@ class TestGenerateEndpoint:
         response = client.post('/generate', json=data)
         assert response.status_code == 400, f"Expected 400, got {response.status_code}"
     
-    @patch('src.resume_generator.core.create_tailored_resume')
+    @patch('src.resume_generator.api.routes.create_tailored_resume')
     def test_generate_endpoint_with_client(self, mock_create_resume, client, test_config):
         """Test generate endpoint using test client"""
         # Mock the resume generation
