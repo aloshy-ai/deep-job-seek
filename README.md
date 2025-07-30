@@ -4,29 +4,21 @@ AI-powered REST API that generates tailored resumes from job descriptions using 
 
 ## Quick Start
 
-### Option 1: Full Docker (Recommended)
+### One-Line Run (No Clone Required)
 ```bash
-git clone https://github.com/aloshy-ai/deep-job-seek.git
-cd deep-job-seek
-docker-compose up --build -d
+curl -sSL https://raw.githubusercontent.com/aloshy-ai/deep-job-seek/main/run.sh | bash
 ```
-API available at `http://localhost:8000`
+**That's it!** API runs at `http://localhost:8000`
 
-### Option 2: Local Development
+### Manual Docker Compose
 ```bash
-git clone https://github.com/aloshy-ai/deep-job-seek.git
-cd deep-job-seek
-python3 -m venv venv && source venv/bin/activate
-pip install -r requirements.txt
-docker-compose up -d qdrant
-python scripts/populate_test_data.py
-python main.py
+curl -o docker-compose.yml https://raw.githubusercontent.com/aloshy-ai/deep-job-seek/main/docker-compose.yml
+docker-compose up -d
 ```
 
 ## Prerequisites
-- Docker & Docker Compose
-- OpenAI-compatible API (e.g., [LM Studio](https://lmstudio.ai/)) 
-- Python 3.8+ (for local development)
+- Docker (that's it!)
+- OpenAI-compatible API (e.g., [LM Studio](https://lmstudio.ai/)) running locally
 
 ## API Endpoints
 

@@ -17,7 +17,8 @@ services:
     volumes:
       - .:/app # Mount the current directory into the container for live code changes (optional for production)
     depends_on:
-      - qdrant
+      qdrant:
+        condition: service_healthy
     entrypoint: ["docker-entrypoint.sh"]
 
   qdrant:
@@ -27,6 +28,12 @@ services:
       - "6334:6334" # Qdrant gRPC API
     volumes:
       - qdrant_data:/qdrant/storage # Persist Qdrant data to a named volume
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/healthz"]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+      start_period: 30s # Give Qdrant time to initialize
 
 volumes:
   qdrant_data: # Define the named volume for Qdrant data persistence

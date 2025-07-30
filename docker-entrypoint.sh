@@ -6,14 +6,12 @@ set -e
 # QDRANT_HOST and QDRANT_PORT are set as environment variables in docker-compose.yml
 QDRANT_HEALTH_URL="http://${QDRANT_HOST}:${QDRANT_PORT}/healthz"
 
-echo "Waiting for Qdrant at ${QDRANT_HEALTH_URL}"
-until curl --output /dev/null --silent --head --fail ${QDRANT_HEALTH_URL};
-do
+echo "Waiting for Qdrant at ${QDRANT_HEALTH_URL}..."
+until curl -s ${QDRANT_HEALTH_URL} | head -n 1 | grep -q "200 OK"; do
   echo -n "."
   sleep 1
 done
-echo "
-Qdrant is up!"
+echo "\nQdrant is up!"
 
 # Run the data population script
 echo "Running data population script..."
